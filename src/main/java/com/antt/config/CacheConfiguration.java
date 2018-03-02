@@ -41,6 +41,7 @@ public class CacheConfiguration {
             cm.createCache(com.antt.domain.User.class.getName(), jcacheConfiguration);
             cm.createCache(com.antt.domain.Authority.class.getName(), jcacheConfiguration);
             cm.createCache(com.antt.domain.User.class.getName() + ".authorities", jcacheConfiguration);
+            cm.createCache(com.antt.domain.Points.class.getName(), jcacheConfiguration);
             // jhipster-needle-ehcache-add-entry
         };
     }
