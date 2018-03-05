@@ -1,0 +1,22 @@
+{
+    "jhealthcheckApp": {
+        "right" : {
+            "home": {
+                "title": "Rights",
+                "createLabel": "Thêm mới một Right",
+                "createOrEditLabel": "Thêm mới hoặc cập nhật Right",
+                "search": "Tìm Right"
+            },
+            "created": "Một Right mới được tạo với định danh {{ param }}",
+            "updated": "Một Right cập nhật với định danh {{ param }}",
+            "deleted": "Một Right đã xóa với định danh {{ param }}",
+            "delete": {
+                "question": "Bạn có chắc là muốn xóa Right {{ id }}?"
+            },
+            "detail": {
+                "title": "Right"
+            },
+            "name": "Name"
+        }
+    }
+}

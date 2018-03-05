@@ -1,0 +1,21 @@
+{
+    "fluentMethods": true,
+    "relationships": [],
+    "fields": [
+        {
+            "fieldName": "name",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required",
+                "maxlength"
+            ],
+            "fieldValidateRulesMaxlength": "255"
+        }
+    ],
+    "changelogDate": "20180302111928",
+    "dto": "no",
+    "service": "no",
+    "entityTableName": "jhi_right",
+    "jpaMetamodelFiltering": false,
+    "pagination": "no"
+}

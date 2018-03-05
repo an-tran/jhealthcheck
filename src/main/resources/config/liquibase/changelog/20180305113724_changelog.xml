@@ -1,0 +1,22 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="BL (generated)" id="1520224650548-1">
+        <createTable tableName="jhi_authority_right">
+            <column name="authority_name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="right_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="BL (generated)" id="1520224650548-2">
+        <addPrimaryKey columnNames="authority_name, right_name" tableName="jhi_authority_right"/>
+    </changeSet>
+    <changeSet author="BL (generated)" id="1520224650548-3">
+        <addUniqueConstraint columnNames="name" constraintName="UK_l2mu9kfvcfv5q4d0dtq0ote1t" tableName="jhi_right"/>
+    </changeSet>
+    <changeSet author="BL (generated)" id="1520224650548-4">
+        <addForeignKeyConstraint baseColumnNames="authority_name" baseTableName="jhi_authority_right" constraintName="FKgxl80qr4mhdikk6jkcv43ramr" deferrable="false" initiallyDeferred="false" referencedColumnNames="name" referencedTableName="jhi_authority"/>
+    </changeSet>
+</databaseChangeLog>

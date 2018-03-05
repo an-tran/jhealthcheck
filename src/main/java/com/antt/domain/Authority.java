@@ -1,14 +1,15 @@
 package com.antt.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Column;
+
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  * An authority (a security role) used by Spring Security.
@@ -25,6 +26,20 @@ public class Authority implements Serializable {
     @Id
     @Column(length = 50)
     private String name;
+
+    public Set<Right> getRights() {
+        return rights;
+    }
+
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+        name = "jhi_authority_right",
+        joinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "name")},
+        inverseJoinColumns = {@JoinColumn(name = "right_name", referencedColumnName = "name")})
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    @BatchSize(size = 20)
+    Set<Right> rights;
 
     public String getName() {
         return name;

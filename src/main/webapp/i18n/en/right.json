@@ -1,0 +1,22 @@
+{
+    "jhealthcheckApp": {
+        "right" : {
+            "home": {
+                "title": "Rights",
+                "createLabel": "Create a new Right",
+                "createOrEditLabel": "Create or edit a Right",
+                "search": "Search for Right"
+            },
+            "created": "A new Right is created with identifier {{ param }}",
+            "updated": "A Right is updated with identifier {{ param }}",
+            "deleted": "A Right is deleted with identifier {{ param }}",
+            "delete": {
+                "question": "Are you sure you want to delete Right {{ id }}?"
+            },
+            "detail": {
+                "title": "Right"
+            },
+            "name": "Name"
+        }
+    }
+}
