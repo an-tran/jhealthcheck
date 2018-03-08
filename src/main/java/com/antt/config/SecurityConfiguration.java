@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -42,19 +43,23 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final SecurityProblemSupport problemSupport;
 
+    private final MPAuthenProvider authenProvider;
+
     public SecurityConfiguration(AuthenticationManagerBuilder authenticationManagerBuilder, UserDetailsService userDetailsService,
-            TokenProvider tokenProvider,CorsFilter corsFilter, SecurityProblemSupport problemSupport) {
+                                 TokenProvider tokenProvider, CorsFilter corsFilter, SecurityProblemSupport problemSupport, MPAuthenProvider authenticationProvider) {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.userDetailsService = userDetailsService;
         this.tokenProvider = tokenProvider;
         this.corsFilter = corsFilter;
         this.problemSupport = problemSupport;
+        this.authenProvider = authenticationProvider;
     }
 
     @PostConstruct
     public void init() {
         try {
             authenticationManagerBuilder
+                .authenticationProvider(authenProvider)
                 .userDetailsService(userDetailsService)
                 .passwordEncoder(passwordEncoder());
         } catch (Exception e) {

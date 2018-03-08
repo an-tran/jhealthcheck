@@ -27,10 +27,6 @@ public class Authority implements Serializable {
     @Column(length = 50)
     private String name;
 
-    public Set<Right> getRights() {
-        return rights;
-    }
-
     @JsonIgnore
     @ManyToMany
     @JoinTable(
@@ -47,6 +43,10 @@ public class Authority implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Set<Right> getRights() {
+        return rights;
     }
 
     @Override

@@ -39,9 +39,11 @@ public class DomainUserDetailsService implements UserDetailsService {
             if (!user.getActivated()) {
                 throw new UserNotActivatedException("User " + lowercaseLogin + " was not activated");
             }
+            //TODO: [antt] filter disableb group (authorities)
             List<GrantedAuthority> grantedAuthorities = user.getAuthorities().stream()
-                    .map(authority -> new SimpleGrantedAuthority(authority.getName()))
-                .collect(Collectors.toList());
+                    .flatMap(authority -> authority.getRights().stream()
+                                            .map(right -> new SimpleGrantedAuthority(right.getName())))
+                    .collect(Collectors.toList());
             return new org.springframework.security.core.userdetails.User(lowercaseLogin,
                 user.getPassword(),
                 grantedAuthorities);

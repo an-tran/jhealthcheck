@@ -65,7 +65,12 @@ public class Right implements Serializable {
         if (right.getName() == null || getName() == null) {
             return false;
         }
-        return Objects.equals(getName(), right.getName());
+
+        if (right.getId() == null || getName() == null) {
+            return false;
+        }
+        return Objects.equals(getName(), right.getName())
+            && Objects.equals(getId(), right.getId());
     }
 
     @Override

@@ -1,5 +1,8 @@
 package com.antt.security.jwt;
 
+import com.antt.domain.Authority;
+import com.antt.domain.Right;
+import com.antt.repository.UserRepository;
 import io.github.jhipster.config.JHipsterProperties;
 
 import java.util.*;
@@ -13,6 +16,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.*;
@@ -23,6 +28,7 @@ public class TokenProvider {
     private final Logger log = LoggerFactory.getLogger(TokenProvider.class);
 
     private static final String AUTHORITIES_KEY = "auth";
+    private static final String RIGHTS_KEY = "right";
 
     private String secretKey;
 
@@ -32,8 +38,11 @@ public class TokenProvider {
 
     private final JHipsterProperties jHipsterProperties;
 
-    public TokenProvider(JHipsterProperties jHipsterProperties) {
+    private final UserRepository userRepository;
+
+    public TokenProvider(JHipsterProperties jHipsterProperties, UserRepository userRepository) {
         this.jHipsterProperties = jHipsterProperties;
+        this.userRepository = userRepository;
     }
 
     @PostConstruct
@@ -48,9 +57,17 @@ public class TokenProvider {
     }
 
     public String createToken(Authentication authentication, Boolean rememberMe) {
-        String authorities = authentication.getAuthorities().stream()
-            .map(GrantedAuthority::getAuthority)
-            .collect(Collectors.joining(","));
+        Optional<com.antt.domain.User> user =  userRepository.findOneWithAuthoritiesByLogin(authentication.getName());
+
+        String authorities = user.map(u -> u.getAuthorities().stream()
+                                .map(Authority::getName)
+                                .collect(Collectors.joining(",")))
+                                .orElse("");
+        String rights = user.map(u -> u.getAuthorities().stream()
+                                        .flatMap(au -> au.getRights().stream()
+                                                        .map(Right::getName))
+                                        .collect(Collectors.joining(",")))
+                            .orElse("");
 
         long now = (new Date()).getTime();
         Date validity;
@@ -62,6 +79,7 @@ public class TokenProvider {
 
         return Jwts.builder()
             .setSubject(authentication.getName())
+            .claim(RIGHTS_KEY, rights)
             .claim(AUTHORITIES_KEY, authorities)
             .signWith(SignatureAlgorithm.HS512, secretKey)
             .setExpiration(validity)
@@ -74,14 +92,17 @@ public class TokenProvider {
             .parseClaimsJws(token)
             .getBody();
 
-        Collection<? extends GrantedAuthority> authorities =
-            Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
+        String roles = claims.get(RIGHTS_KEY).toString();
+        Collection<? extends GrantedAuthority> roles_rights = Collections.emptyList();
+        if (!roles.trim().isEmpty()) {
+            roles_rights =
+                Arrays.stream(roles.split(","))
+                    .map(SimpleGrantedAuthority::new)
+                    .collect(Collectors.toList());
+        }
+        User principal = new User(claims.getSubject(), "", roles_rights);
 
-        User principal = new User(claims.getSubject(), "", authorities);
-
-        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+        return new UsernamePasswordAuthenticationToken(principal, token, roles_rights);
     }
 
     public boolean validateToken(String authToken) {
