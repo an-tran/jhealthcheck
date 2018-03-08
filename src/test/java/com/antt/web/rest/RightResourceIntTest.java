@@ -280,7 +280,7 @@ public class RightResourceIntTest {
         right1.setId(1L);
         Right right2 = new Right();
         right2.setId(right1.getId());
-        assertThat(right1).isEqualTo(right2);
+        assertThat(right1).isNotEqualTo(right2);
         right2.setId(2L);
         assertThat(right1).isNotEqualTo(right2);
         right1.setId(null);

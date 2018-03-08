@@ -19,4 +19,21 @@
     <changeSet author="BL (generated)" id="1520224650548-4">
         <addForeignKeyConstraint baseColumnNames="authority_name" baseTableName="jhi_authority_right" constraintName="FKgxl80qr4mhdikk6jkcv43ramr" deferrable="false" initiallyDeferred="false" referencedColumnNames="name" referencedTableName="jhi_authority"/>
     </changeSet>
+
+    <changeSet author="BL (generated)" id="1520224650548-5">
+        <loadData encoding="UTF-8"
+                  file="config/liquibase/rights.csv"
+                  separator=";"
+                  tableName="jhi_right"/>
+        <loadData encoding="UTF-8"
+                  file="config/liquibase/authorities_rights.csv"
+                  separator=";"
+                  tableName="jhi_authority_right"/>
+    </changeSet>
+
+    <changeSet author="BL" id="1520224650548-6">
+        <modifyDataType columnName="principal"
+                        newDataType="varchar(512)"
+                        tableName="JHI_PERSISTENT_AUDIT_EVENT "/>
+    </changeSet>
 </databaseChangeLog>

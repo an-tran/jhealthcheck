@@ -1,17 +1,24 @@
 package com.antt.security.jwt;
 
+import com.antt.JhealthcheckApp;
+import com.antt.repository.UserRepository;
 import com.antt.security.AuthoritiesConstants;
 import io.github.jhipster.config.JHipsterProperties;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,17 +26,22 @@ import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = JhealthcheckApp.class)
+@Transactional
 public class TokenProviderTest {
 
     private final String secretKey = "e5c9ee274ae87bc031adda32e27fa98b9290da83";
     private final long ONE_MINUTE = 60000;
     private JHipsterProperties jHipsterProperties;
     private TokenProvider tokenProvider;
+    @Autowired
+    private UserRepository userRepository;
 
     @Before
     public void setup() {
         jHipsterProperties = Mockito.mock(JHipsterProperties.class);
-        tokenProvider = new TokenProvider(jHipsterProperties);
+        tokenProvider = new TokenProvider(jHipsterProperties, userRepository);
         ReflectionTestUtils.setField(tokenProvider, "secretKey", secretKey);
         ReflectionTestUtils.setField(tokenProvider, "tokenValidityInMilliseconds", ONE_MINUTE);
     }
