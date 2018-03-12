@@ -9,6 +9,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -35,7 +36,7 @@ public class Authority implements Serializable {
         inverseJoinColumns = {@JoinColumn(name = "right_name", referencedColumnName = "name")})
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @BatchSize(size = 20)
-    Set<Right> rights;
+    Set<Right> rights = new HashSet<>();
 
     public String getName() {
         return name;
