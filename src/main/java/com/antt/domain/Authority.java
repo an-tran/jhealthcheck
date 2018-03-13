@@ -38,6 +38,10 @@ public class Authority implements Serializable {
     @BatchSize(size = 20)
     Set<Right> rights = new HashSet<>();
 
+    @NotNull
+    @Column(nullable = false)
+    private boolean enabled = true;
+
     public String getName() {
         return name;
     }
@@ -73,6 +77,15 @@ public class Authority implements Serializable {
     public String toString() {
         return "Authority{" +
             "name='" + name + '\'' +
+            "enabled='" + enabled+ '\'' +
             "}";
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }
