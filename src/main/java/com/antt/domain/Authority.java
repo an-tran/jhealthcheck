@@ -6,6 +6,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -41,6 +42,15 @@ public class Authority implements Serializable {
     @NotNull
     @Column(nullable = false)
     private boolean enabled = true;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name="created_by", nullable = false)
+    private User created_by;
+
+    @NotNull
+    @Size(max = 255)
+    @Column(nullable = false)
+    private String path = "";
 
     public String getName() {
         return name;

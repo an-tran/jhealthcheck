@@ -1,0 +1,36 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="BL (generated)" id="1521022106830-1">
+        <addColumn tableName="jhi_authority">
+            <column name="created_by" type="bigint" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="BL (generated)" id="1521022106830-2">
+        <addColumn tableName="jhi_authority">
+            <column name="path" type="varchar(255)" defaultValue="">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="BL (generated)" id="1521022106830-3">
+        <addForeignKeyConstraint baseColumnNames="created_by" baseTableName="jhi_authority" constraintName="FKnkfg8wsyt1g3byff81nhthbxy" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="jhi_user"/>
+    </changeSet>
+    <!--<changeSet author="BL (generated)" id="1521022106830-4">-->
+        <!--<addDefaultValue-->
+                         <!--columnDataType="bigint"-->
+                         <!--columnName="created_by"-->
+                         <!--defaultValueNumeric="1"-->
+                         <!--tableName="jhi_authority"/>-->
+    <!--</changeSet>-->
+    <changeSet author="BL (generated)" id="1521022106830-5">
+        <loadUpdateData
+                        encoding="UTF-8"
+                        file="config/liquibase/authorities.csv"
+                        primaryKey="name"
+                        separator=";"
+                        tableName="jhi_authority">
+        </loadUpdateData>
+    </changeSet>
+</databaseChangeLog>

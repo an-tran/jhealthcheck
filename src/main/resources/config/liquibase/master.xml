@@ -10,5 +10,7 @@
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <include file="config/liquibase/changelog/20180301110659_added_entity_constraints_Points.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20180305113724_add_right.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20180313150858_enabled_user_authority.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20180314170822_add_load_createdby_path_authority.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
 </databaseChangeLog>
