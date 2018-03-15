@@ -14,7 +14,8 @@ public final class AuthoritiesConstants {
     public static final String DELETE_USER = "ROLE_RIGHT_USER_DELETE";
     public static final String UPDATE_USER = "ROLE_RIGHT_USER_UPDATE";
     public static final String LIST_AUTHORITIES = "ROLE_RIGHT_AUTHORITY_LIST";
-    public static final String DISABLE_AUTHORITY = "ROLE_RIGHT_AUTHORITY_DISABLED";
+    public static final String UPDATE_AUTHORITY = "ROLE_RIGHT_AUTHORITY_UPDATE";
+    public static final String CREATE_AUTHORITY = "ROLE_RIGHT_AUTHORITY_CREATE";
 
     private AuthoritiesConstants() {
     }

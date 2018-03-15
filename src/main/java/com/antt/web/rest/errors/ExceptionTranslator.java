@@ -95,4 +95,9 @@ public class ExceptionTranslator implements ProblemHandling {
             .build();
         return create(ex, problem, request);
     }
+
+    @ExceptionHandler(ForbiddenResourceException.class)
+    public ResponseEntity<Problem> handleForbiddenResourceException(ForbiddenResourceException ex, NativeWebRequest request) {
+        return create(ex, request);
+    }
 }

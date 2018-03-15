@@ -27,7 +27,7 @@
     <changeSet author="BL (generated)" id="1521022106830-5">
         <loadUpdateData
                         encoding="UTF-8"
-                        file="config/liquibase/authorities.csv"
+                        file="config/liquibase/authorities_update.csv"
                         primaryKey="name"
                         separator=";"
                         tableName="jhi_authority">

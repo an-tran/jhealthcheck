@@ -39,12 +39,11 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JhealthcheckApp.class)
-
 public class AuthorizationTest {
     @Autowired
     WebApplicationContext wac;
-    @Autowired
-    private FilterChainProxy filterChainProxy;
+//    @Autowired
+//    private FilterChainProxy filterChainProxy;
     @Mock
     UserRepository mockUserrepository;
 
@@ -60,17 +59,17 @@ public class AuthorizationTest {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private UserMapper userMapper;
-
-    @Autowired
-    private MappingJackson2HttpMessageConverter jacksonMessageConverter;
-
-    @Autowired
-    private PageableHandlerMethodArgumentResolver pageableArgumentResolver;
-
-    @Autowired
-    private ExceptionTranslator exceptionTranslator;
+//    @Autowired
+//    private UserMapper userMapper;
+//
+//    @Autowired
+//    private MappingJackson2HttpMessageConverter jacksonMessageConverter;
+//
+//    @Autowired
+//    private PageableHandlerMethodArgumentResolver pageableArgumentResolver;
+//
+//    @Autowired
+//    private ExceptionTranslator exceptionTranslator;
 
     private MockMvc restUserMvc;
     private static final String DEFAULT_EMAIL = "johndoe@localhost";
