@@ -50,11 +50,21 @@ public interface AuthorityRepository extends JpaRepository<Authority, String> {
         , nativeQuery = true)
     int addAuthorityPathFor(@Param("parent_name") String parent_name, @Param("auth_name") String auth_name);
 
-
     @Modifying
     @Query(value =
         "insert into JHI_AUTHORITY_PATH (ancestor, descendant)" +
             "  select :auth_name, :auth_name ;"
         , nativeQuery = true)
     int addSelfAuthorityPath(@Param("auth_name") String auth_name);
+
+    @Query(value =
+        "WITH aap AS ( SELECT * FROM JHI_AUTHORITY_PATH ap join JHI_AUTHORITY  au on au.name = ap.ancestor) " +
+        "SELECT * FROM JHI_AUTHORITY " +
+        "WHERE name in (SELECT descendant FROM aap where owner = ?1) ;", nativeQuery = true)
+    List<Authority> findAuthorityHierarchyOf(Long userId);
+
+    @Query(value = "SELECT au.* FROM JHI_AUTHORITY_PATH ap join JHI_AUTHORITY  au " +
+        "on au.name = ap.ancestor " +
+        "where descendant = ?1", nativeQuery = true)
+    List<Authority> finAllAncestor(String authority);
 }

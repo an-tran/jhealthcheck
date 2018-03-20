@@ -50,6 +50,9 @@ public class Authority implements Serializable {
     private User owner;
 
 
+    @OneToOne
+    private Authority parent;
+
     public User getCreator() {
         return creator;
     }
@@ -115,5 +118,13 @@ public class Authority implements Serializable {
 
     public void setOwner(User owner) {
         this.owner = owner;
+    }
+
+    public Authority getParent() {
+        return parent;
+    }
+
+    public void setParent(Authority parent) {
+        this.parent = parent;
     }
 }

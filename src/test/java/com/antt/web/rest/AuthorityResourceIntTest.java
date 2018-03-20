@@ -23,6 +23,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -121,6 +122,7 @@ public class AuthorityResourceIntTest {
         authorityDTO.setEnabled(true);
         authorityDTO.setRights(new HashSet<>(Arrays.asList(
             AuthoritiesConstants.LIST_AUTHORITIES, AuthoritiesConstants.CREATE_AUTHORITY)));
+        authorityDTO.setParent("ROLE_VN");
 
         restMockMvc.perform(post("/api/authorities")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -132,6 +134,9 @@ public class AuthorityResourceIntTest {
             .andExpect(jsonPath("$.rights").isArray())
             .andExpect(jsonPath("$.rights.[*].name").value(contains(
                 AuthoritiesConstants.LIST_AUTHORITIES,AuthoritiesConstants.CREATE_AUTHORITY)));
+
+        List<Authority> ancestors = authorityRepository.finAllAncestor(DEFAULT_NAME);
+        assertThat(ancestors.size()).isEqualTo(3);
     }
 
     @Test
@@ -175,4 +180,14 @@ public class AuthorityResourceIntTest {
 
     }
 
+    @Test
+    @Transactional
+    @WithUserDetails(value = "admin", userDetailsServiceBeanName = "userDetailsService")
+    public void testGetAuthorities() throws Exception {
+        ResultActions resultActions = restMockMvc.perform(get("/api/authorities"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(jsonPath("$.[*].name").value(hasItem("ROLE_HCM")));
+        resultActions.andReturn().getResponse();
+    }
 }

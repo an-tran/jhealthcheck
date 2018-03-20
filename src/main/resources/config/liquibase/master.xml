@@ -14,5 +14,6 @@
     <include file="config/liquibase/changelog/20180314170822_add_load_createdby_path_authority.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20180319153741_add_table_authority_path.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20180319155259_add_owner_colum.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20180320144140_add_authority_parent.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
 </databaseChangeLog>

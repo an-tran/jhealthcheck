@@ -39,17 +39,17 @@ public class AuthorityResource {
 
     private final Logger log = LoggerFactory.getLogger(AuthorityResource.class);
     private final UserService userService;
-    private final AuthorityRepository authorityRepository;
+    private final AuthorityRepository authorityRepo;
     private final UserRepository userRepository;
-    private final RightRepository rightRepository;
+    private final RightRepository rightRepo;
 
     public AuthorityResource(UserService userService, UserRepository userRepository,
-                             AuthorityRepository authorityRepository,
+                             AuthorityRepository authorityRepo,
                              RightRepository rightRepository) {
-        this.authorityRepository = authorityRepository;
+        this.authorityRepo = authorityRepo;
         this.userRepository = userRepository;
         this.userService = userService;
-        this.rightRepository = rightRepository;
+        this.rightRepo = rightRepository;
     }
 
 
@@ -58,26 +58,27 @@ public class AuthorityResource {
 
     /***
      * Create a group. Owner of new group is the current login user
-     * @param authorityDTO
+     * @param dto
      * @return new Authority
      */
     @PostMapping("/authorities")
     @Secured(AuthoritiesConstants.CREATE_AUTHORITY)
     @Transactional
-    public ResponseEntity<Authority> createGroup(@Valid @RequestBody AuthorityDTO authorityDTO) throws URISyntaxException {
-        if (authorityRepository.exists(authorityDTO.getName())) {
+    public ResponseEntity<Authority> createGroup(@Valid @RequestBody AuthorityDTO dto) throws URISyntaxException {
+        if (authorityRepo.exists(dto.getName())) {
            throw new BadRequestAlertException("Group name already in use", "Authority", "error.createAuthority");
         }
 
         Authority newAuth = new Authority();
         Optional<User> user = getLoginUser();
 
-        newAuth.setName(authorityDTO.getName());
+        newAuth.setName(dto.getName());
         newAuth.setCreator(user.orElse(null));
-        newAuth.setEnabled(authorityDTO.isEnabled());
-        if(authorityDTO.getRights() != null) {
-            Set<Right> rights = authorityDTO.getRights().stream()
-                .map(rightRepository::findOneByName)
+        newAuth.setEnabled(dto.isEnabled());
+        newAuth.setParent(authorityRepo.findOne(dto.getParent()));
+        if(dto.getRights() != null) {
+            Set<Right> rights = dto.getRights().stream()
+                .map(rightRepo::findOneByName)
                 .map(rightOptional -> rightOptional.orNull())
                 .filter(r -> r != null)
                 .collect(Collectors.toSet());
@@ -85,11 +86,11 @@ public class AuthorityResource {
         }
         newAuth.setCreator(user.get());
         newAuth.setOwner(user.get());
-        Authority savedAuth = authorityRepository.save(newAuth);
+        Authority savedAuth = authorityRepo.save(newAuth);
 
         // bug of H2 so that cannot use UNION statement. Using 2 insert statement
-        int changed = authorityRepository.addAuthorityPathFor("ROLE_HCM", authorityDTO.getName());
-        changed = authorityRepository.addSelfAuthorityPath(authorityDTO.getName());
+        int changed = authorityRepo.addAuthorityPathFor(dto.getParent(), dto.getName());
+        changed = authorityRepo.addSelfAuthorityPath(dto.getName());
 
         return ResponseEntity.created(new URI("/api/authorities/" + savedAuth.getName()))
             .headers(HeaderUtil.createAlert("authorities.created", savedAuth.getName()))
@@ -101,7 +102,7 @@ public class AuthorityResource {
     public ResponseEntity<List<Authority>> getCurrentUserGroup() {
         Optional<User> user = getLoginUser();
 
-        List<Authority> authorities = user.map(u -> authorityRepository.findAllByOwner(u))
+        List<Authority> authorities = user.map(u -> authorityRepo.findAuthorityHierarchyOf(u.getId()))
             .orElse(Collections.emptyList());
 
         return ResponseEntity.ok(authorities);
@@ -119,17 +120,17 @@ public class AuthorityResource {
         currentUserCanChangeGroup(groupName);
 
         //disabled group and its members
-//        List<Authority> disabledAuthorities = authorityRepository.disableGroupsByName(enabledAuthorities);
+//        List<Authority> disabledAuthorities = authorityRepo.disableGroupsByName(enabledAuthorities);
 //
 //        if (disabledAuthorities.size() != enabledAuthorities.size()) {
 //            log.warn("Expect to disabled {} groups but actually {} groups changed", enabledAuthorities.size(), disabledAuthorities.size());
 //        }
-        int ret = authorityRepository.disableByName(groupName);
-        List<Long> memberIds = authorityRepository.findUserIdByGroupName(groupName);
+        int ret = authorityRepo.disableByName(groupName);
+        List<Long> memberIds = authorityRepo.findUserIdByGroupName(groupName);
         userRepository.disableUsersById(memberIds);
-//        authorityRepository.flush();
+//        authorityRepo.flush();
 //        userRepository.flush();
-//        Authority g =  authorityRepository.findOne(groupName);
+//        Authority g =  authorityRepo.findOne(groupName);
 //        System.out.println(g.isEnabled());
     }
 
@@ -144,8 +145,8 @@ public class AuthorityResource {
         //check user has right to disable this group
         currentUserCanChangeGroup(groupName);
 
-        int ret = authorityRepository.enableByName(groupName);
-        List<Long> memberIds = authorityRepository.findUserIdByGroupName(groupName);
+        int ret = authorityRepo.enableByName(groupName);
+        List<Long> memberIds = authorityRepo.findUserIdByGroupName(groupName);
         userRepository.enableUsersById(memberIds);
     }
 

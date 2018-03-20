@@ -20,6 +20,8 @@ public class AuthorityDTO {
 
     Set<String> rights;
 
+    private String parent;
+
     @Override
     public String toString() {
         return "AuthorityDTO{" +
@@ -51,5 +53,13 @@ public class AuthorityDTO {
 
     public void setRights(Set<String> rights) {
         this.rights = rights;
+    }
+
+    public String getParent() {
+        return parent;
+    }
+
+    public void setParent(String parent) {
+        this.parent = parent;
     }
 }

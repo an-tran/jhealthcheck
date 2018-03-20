@@ -1,0 +1,31 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="BL (generated)" id="1521449584497-1">
+        <addColumn tableName="jhi_authority">
+            <column name="owner" type="bigint" defaultValue="3">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="BL (generated)" id="1521449584497-2">
+        <addForeignKeyConstraint baseColumnNames="owner" baseTableName="jhi_authority" constraintName="FKtqtnypvl9ncwgq48h6xlwo8lt" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="jhi_user"/>
+    </changeSet>
+    <changeSet author="BL (generated)" id="1521449584497-4">
+        <dropDefaultValue columnDataType="bigint" columnName="created_by" tableName="jhi_authority"/>
+    </changeSet>
+    <changeSet author="BL (generated)" id="1521449584497-5">
+        <dropDefaultValue columnDataType="boolean" columnName="enabled" tableName="jhi_authority"/>
+    </changeSet>
+    <changeSet author="BL (generated)" id="1521449584497-6">
+        <dropDefaultValue columnDataType="boolean" columnName="enabled" tableName="jhi_user"/>
+    </changeSet>
+    <changeSet author="BL (generated)" id="1521022106830-5">
+        <loadUpdateData
+            encoding="UTF-8"
+            file="config/liquibase/authority_path.csv"
+            separator=";"
+            primaryKey="ancestor,descendant"
+            tableName="jhi_authority_path">
+        </loadUpdateData>
+    </changeSet>
+</databaseChangeLog>
