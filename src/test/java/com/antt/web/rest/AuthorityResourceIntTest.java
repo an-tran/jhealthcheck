@@ -4,9 +4,13 @@ import com.antt.JhealthcheckApp;
 import com.antt.domain.Authority;
 import com.antt.domain.User;
 import com.antt.repository.AuthorityRepository;
+import com.antt.repository.RightRepository;
 import com.antt.repository.UserRepository;
+import com.antt.security.AuthoritiesConstants;
 import com.antt.service.UserService;
+import com.antt.service.dto.AuthorityDTO;
 import com.antt.web.rest.errors.ExceptionTranslator;
+import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,6 +18,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -22,14 +27,18 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 /**
  * Test class for the AuthorityResource REST controller.
  *
@@ -39,6 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = JhealthcheckApp.class)
 public class AuthorityResourceIntTest {
 
+    private static final String DEFAULT_NAME = "ROLE_UNITTEST";
     private MockMvc restMockMvc;
     @Autowired
     private UserService userService;
@@ -46,6 +56,9 @@ public class AuthorityResourceIntTest {
     private AuthorityRepository authorityRepository;
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private RightRepository rightRepository;
 
     @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -71,7 +84,8 @@ public class AuthorityResourceIntTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        AuthorityResource authorityResource = new AuthorityResource(userService, userRepository, authorityRepository);
+        AuthorityResource authorityResource = new AuthorityResource(
+            userService, userRepository, authorityRepository, rightRepository);
         restMockMvc = MockMvcBuilders
             .standaloneSetup(authorityResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
@@ -90,6 +104,55 @@ public class AuthorityResourceIntTest {
         userRepository.saveAndFlush(admin);
     }
 
+    public static Authority createAuthority() {
+        Authority auth = new Authority();
+        auth.setName(DEFAULT_NAME + RandomStringUtils.randomAlphabetic(2));
+        auth.setEnabled(true);
+
+        return auth;
+    }
+
+    @Test
+    @WithUserDetails(value = "admin", userDetailsServiceBeanName = "userDetailsService")
+    @Transactional
+    public void testCreateAuthority() throws Exception {
+        AuthorityDTO authorityDTO = new AuthorityDTO();
+        authorityDTO.setName(DEFAULT_NAME);
+        authorityDTO.setEnabled(true);
+        authorityDTO.setRights(new HashSet<>(Arrays.asList(
+            AuthoritiesConstants.LIST_AUTHORITIES, AuthoritiesConstants.CREATE_AUTHORITY)));
+
+        restMockMvc.perform(post("/api/authorities")
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .content(TestUtil.convertObjectToJsonBytes(authorityDTO)))
+            .andExpect(status().isCreated())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
+            .andExpect(jsonPath("$.owner.login").value("admin"))
+            .andExpect(jsonPath("$.rights").isArray())
+            .andExpect(jsonPath("$.rights.[*].name").value(contains(
+                AuthoritiesConstants.LIST_AUTHORITIES,AuthoritiesConstants.CREATE_AUTHORITY)));
+    }
+
+    @Test
+    @WithUserDetails(value = "admin", userDetailsServiceBeanName = "userDetailsService")
+    @Transactional
+    public void createWithDuplicateAuthorityName() throws Exception {
+        long nAuthorityBeforeCreate = authorityRepository.count();
+        AuthorityDTO authorityDTO = new AuthorityDTO();
+        authorityDTO.setName("ROLE_ADMIN");
+        authorityDTO.setEnabled(true);
+        authorityDTO.setRights(new HashSet<>(Arrays.asList(
+            AuthoritiesConstants.LIST_AUTHORITIES, AuthoritiesConstants.CREATE_AUTHORITY)));
+
+        restMockMvc.perform(post("/api/authorities")
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .content(TestUtil.convertObjectToJsonBytes(authorityDTO)))
+            .andExpect(status().isBadRequest());
+
+        long nAuthorityAfterCreate = authorityRepository.count();
+        assertThat(nAuthorityAfterCreate).isEqualTo(nAuthorityBeforeCreate);
+    }
     /**
     * Test disableAuthority
     */
@@ -109,7 +172,6 @@ public class AuthorityResourceIntTest {
         assertThat(updatedAuth.isEnabled()).isFalse();
         assertThat(updateUser.isEnabled()).isFalse();
         assertThat(updateAdmin.isEnabled()).isFalse();
-
 
     }
 

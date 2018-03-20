@@ -1,12 +1,10 @@
 package com.antt.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
-import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -24,12 +22,12 @@ public class Authority implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @NotNull
-    @Size(max = 50)
+    @Size(max = 50, message = "Group name is allowed maximum 50 characters")
     @Id
     @Column(length = 50)
     private String name;
 
-    @JsonIgnore
+//    @JsonIgnore
     @ManyToMany
     @JoinTable(
         name = "jhi_authority_right",
@@ -39,18 +37,26 @@ public class Authority implements Serializable {
     @BatchSize(size = 20)
     Set<Right> rights = new HashSet<>();
 
-    @NotNull
+//    @NotNull
     @Column(nullable = false)
     private boolean enabled = true;
 
     @ManyToOne(optional = false)
     @JoinColumn(name="created_by", nullable = false)
-    private User created_by;
+    private User creator;
 
-    @NotNull
-    @Size(max = 255)
-    @Column(nullable = false)
-    private String path = "";
+    @ManyToOne(optional = false)
+    @JoinColumn(name="owner", nullable = false)
+    private User owner;
+
+
+    public User getCreator() {
+        return creator;
+    }
+
+    public void setCreator(User creator) {
+        this.creator = creator;
+    }
 
     public String getName() {
         return name;
@@ -62,6 +68,10 @@ public class Authority implements Serializable {
 
     public Set<Right> getRights() {
         return rights;
+    }
+
+    public void setRights(Set<Right> rights) {
+        this.rights = rights;
     }
 
     @Override
@@ -97,5 +107,13 @@ public class Authority implements Serializable {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
     }
 }
