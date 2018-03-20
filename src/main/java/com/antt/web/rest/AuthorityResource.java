@@ -99,10 +99,14 @@ public class AuthorityResource {
 
     @GetMapping("/authorities")
     @Secured(AuthoritiesConstants.LIST_AUTHORITIES)
-    public ResponseEntity<List<Authority>> getCurrentUserGroup() {
+    public ResponseEntity<List<Authority>> getCurrentUserGroups() {
         Optional<User> user = getLoginUser();
 
-        List<Authority> authorities = user.map(u -> authorityRepo.findAuthorityHierarchyOf(u.getId()))
+        List<Authority> authorities = user.map(
+                u -> authorityRepo.findAuthorityHierarchyOf(u.getId())
+                    .stream()
+                    .filter(Authority::isEnabled)
+                    .collect(Collectors.toList()))
             .orElse(Collections.emptyList());
 
         return ResponseEntity.ok(authorities);
@@ -152,7 +156,8 @@ public class AuthorityResource {
 
     private void currentUserCanChangeGroup(String groupName) {
         Optional<User> user = getLoginUser();
-        List<String> enabledAuthorities = user.map(u -> u.getAuthorities().stream()
+        List<String> enabledAuthorities = user.map(u -> authorityRepo.findAuthorityHierarchyOf(u.getId())
+                                                .stream()
                                                 .filter(Authority::isEnabled)
                                                 .map(Authority::getName)
                                                 .collect(Collectors.toList()))

@@ -4,6 +4,7 @@ import com.antt.domain.User;
 import com.antt.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -38,6 +39,9 @@ public class DomainUserDetailsService implements UserDetailsService {
         return userFromDatabase.map(user -> {
             if (!user.getActivated()) {
                 throw new UserNotActivatedException("User " + lowercaseLogin + " was not activated");
+            }
+            if (!user.isEnabled()) {
+                throw  new UserDisabledException("User " + lowercaseLogin + " was disabled");
             }
             //TODO: [antt] filter disableb group (authorities)
             List<GrantedAuthority> grantedAuthorities = user.getAuthorities().stream()
